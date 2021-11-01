@@ -1,0 +1,153 @@
+.container {
+    background: transparent;
+    text-align: center;
+}
+
+.form {
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 30px;
+    background-color: #fff;
+}
+
+.title {
+    margin: 0;
+    margin-bottom: 10px;
+
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.form > .inputLabel {
+    margin-bottom: 20px;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.input {
+    padding-top: 6px;
+    padding-right: 12px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    border: 2px solid #eee;
+    font-size: 15px;
+  
+    outline: none;
+}
+
+.errorMessage {
+    width: 100%;
+    max-width: 372px;
+    margin: 0;
+    margin-top: 5px;
+
+    font-weight: 400;
+    font-size: 11px;
+    color: red;
+}
+
+.buttonSubmit {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+
+    background: #24cca7;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+    .container {
+        height: 100vh;
+        padding-top: 50px;
+        padding-right: 10px;
+        padding-bottom: 50px;
+        padding-left: 10px;
+    }
+
+    .form {
+        max-width: 250px;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+    
+    .buttonSubmit {
+        max-width: 80px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .form {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .input {
+        width: 100%;
+    }
+
+    .buttonSubmit {
+        max-width: 120px;
+        padding-right: 30px;
+        padding-left: 30px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+    .container {
+        height: 100vh;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .form {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 1279px) {
+    .container {
+        text-align: center;
+    }
+
+    .form {
+        display: inline-block;
+    }
+
+    label {
+        width: 100%;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        height: 100vh;
+        padding-top: 102px;
+        padding-bottom: 102px;
+    }
+
+    .form {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+
+        max-width: 540px;
+    }
+
+    .input {
+        width: 372px;
+    }
+}
