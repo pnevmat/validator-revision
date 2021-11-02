@@ -14,20 +14,23 @@ const RegistrationForm = () => {
 
     const validationSchema = {
         email: false,
-        length: {min: 6, max: false},
-        custom: {
-            capitalLetters: /([A-Z])/g,
-            numbers: /([0-9])/g,
-            symbols: /\W/g
-        }
+        length: 6,
+        // {min: 6, max: false},
+        custom: /([A-Z])/g
+        // {
+        //     capitalLetters: /([A-Z])/g,
+        //     numbers: /([0-9])/g,
+        //     symbols: /\W/g
+        // }
     };
 
     const errors = {
         email: 'Email is not valid',
-        length: {
-            min: 'Statement should be at least 6 characters', 
-            max: 'Statement should be not longer than 8 characters'
-        },
+        length: 'Statement length should be 6 characters',
+        // {
+        //     min: 'Statement should be at least 6 characters', 
+        //     max: 'Statement should be not longer than 8 characters'
+        // },
         symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
     };
 
@@ -39,14 +42,18 @@ const RegistrationForm = () => {
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(Validator.email(emailChange, validationSchema, errors));
+                setEmailValidation(Validator.exactLength(emailChange, validationSchema, errors));
                 break;
             case 'name':
                 setNameChange(value);
                 break;
             case 'password':
                 setPasswordChange(value);
-                setPasswordValidation(Validator.minMax(passwordChange, validationSchema, errors).custom(passwordChange, validationSchema, errors));
+                if (Validator.minMax(passwordChange, validationSchema, errors)) {
+                    setPasswordValidation(Validator.minMax(passwordChange, validationSchema, errors));
+                } else {
+                    setPasswordValidation(Validator.custom(passwordChange, validationSchema, errors));
+                };
                 console.log('Password validation: ', passwordValidation);
                 break;
             default:

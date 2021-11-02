@@ -38,8 +38,10 @@ const Validator = {
         };
     },
 
-    // Exact length validation
+    // Exact length validation (работает не корректно - надо поправить)
     exactLength: function(phrase, validationSchema, errors) {
+        console.log('Validation schema length in exactLangth func: ', validationSchema.length);
+        console.log('Phrase length: ', phrase.length);
         if (typeof validationSchema.length === 'number') {
             if (phrase.length < validationSchema.length || phrase.length > validationSchema.length) {
                 validationResult = errors.length;
@@ -58,16 +60,28 @@ const Validator = {
 
         for (let key of validationSchemaKeys) {
             if (key === 'custom') {
+                
+                if (typeof key === 'object') {
+                    const customKeys = Object.keys(validationSchema[key]);
+                    for (let customKey of customKeys) {
 
-                for (let customKey of key) {
-
-                    validationResult = validationSchema.custom[customKey].test(phrase);
-
+                        validationResult = validationSchema.custom[customKey].test(phrase);
+    
+                        if (!validationResult) {
+                            validationResult = errors.symbols;
+                            return validationResult;
+                        } else {
+                            continue;
+                        };
+                    };
+                } else {
+                    validationResult = validationSchema[key].test(phrase);
+    
                     if (!validationResult) {
                         validationResult = errors.symbols;
                         return validationResult;
                     } else {
-                        continue;
+                        return false;
                     };
                 };
 
