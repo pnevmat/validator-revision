@@ -1,6 +1,21 @@
 let validationResult = null;
-// TODO: создать вариант валидации емейла и схемы валидации на маленькие буквы
-const validator = (phrase, validationSchema, errors) => {
+// TODO: создать вариант схемы валидации на маленькие буквы
+function Validator(phrase, validationSchema, errors) {
+    console.log('Phrase in validator: ', phrase);
+
+    // pattern validations (validations on predefined schemas)
+    this.email = function() {
+        const emailValidationSchema = /@/;
+
+        validationResult = emailValidationSchema.test(phrase);
+
+        if (!validationResult) {
+            validationResult = errors.email;
+            return validationResult;
+        } else {
+            return false;
+        };
+    };
 
     // Min/max phrase length validation
     if (validationSchema.length) {
@@ -47,4 +62,4 @@ const validator = (phrase, validationSchema, errors) => {
     return validationResult;
 };
 
-export default validator;
+export default Validator;

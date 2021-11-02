@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import validator from '../../utils/validator';
+import Validator from '../../utils/validator';
 
 import styles from './loginForm.module.css';
 
@@ -20,8 +20,11 @@ const LoginForm = () => {
 
     const errors = {
         length: 'Statement should be at least 6 characters',
-        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
+        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter',
+        email: 'Email is not valid'
     };
+
+    const validator = new Validator(emailChange, validationSchema, errors);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -29,7 +32,7 @@ const LoginForm = () => {
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(validator(emailChange, validationSchema, errors));
+                setEmailValidation(validator.email());
                 break;
             case 'password':
                 setPasswordChange(value);
