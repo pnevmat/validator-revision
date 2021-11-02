@@ -1,10 +1,10 @@
 let validationResult = null;
-// TODO: создать вариант схемы валидации на маленькие буквы
-function Validator(phrase, validationSchema, errors) {
-    console.log('Phrase in validator: ', phrase);
+// TODO: разобратьс почему одна функция валидации не вызываетс за другой как например map().find() и т.п.
+const Validator = {
 
     // pattern validations (validations on predefined schemas)
-    this.email = function() {
+    email: function(phrase, validationSchema, errors) {
+        
         const emailValidationSchema = /@/;
 
         validationResult = emailValidationSchema.test(phrase);
@@ -15,51 +15,71 @@ function Validator(phrase, validationSchema, errors) {
         } else {
             return false;
         };
-    };
+    },
 
     // Min/max phrase length validation
-    if (validationSchema.length) {
-        if (typeof validationSchema.length === 'object') {
-           
-            if (typeof validationSchema.length.min === 'number' && phrase.length < validationSchema.length.min) {
-                return errors.length.min;
+    minMax: function(phrase, validationSchema, errors) {
+        if (validationSchema.length) {
+            if (typeof validationSchema.length === 'object') {
+               
+                if (typeof validationSchema.length.min === 'number' && phrase.length < validationSchema.length.min) {
+                    return errors.length.min;
+                };
+    
+                if (typeof validationSchema.length.max === 'number' && phrase.length > validationSchema.length.max) {
+                    return errors.length.max;
+                };
+    
+            } else {
+                return;
             };
-
-            if (typeof validationSchema.length.max === 'number' && phrase.length > validationSchema.length.max) {
-                console.log('Length max');
-                return errors.length.max;
-            };
-
         } else {
-            // Exact length validation
+            return;
+        };
+    },
+
+    // Exact length validation
+    exactLength: function(phrase, validationSchema, errors) {
+        if (typeof validationSchema.length === 'number') {
             if (phrase.length < validationSchema.length || phrase.length > validationSchema.length) {
                 validationResult = errors.length;
                 return validationResult;
+            } else {
+                return false;
             };
+        } else {
+            return;
         };
-    };
+    },
     
-    const validationSchemaKeys = Object.keys(validationSchema);
+    // Custom validation (put validation Regexp to validation schema)
+    custom: function(phrase, validationSchema, errors) {
+        const validationSchemaKeys = Object.keys(validationSchema);
 
-    // Capital letter, number and symbol validation
-    for (let key of validationSchemaKeys) {
-        if (key !== 'length') {
-            validationResult = validationSchema[key].test(phrase);
+        for (let key of validationSchemaKeys) {
+            if (key === 'custom') {
 
-            if (!validationResult) {
-                validationResult = errors.symbols;
-                return validationResult;
+                for (let customKey of key) {
+
+                    validationResult = validationSchema.custom[customKey].test(phrase);
+
+                    if (!validationResult) {
+                        validationResult = errors.symbols;
+                        return validationResult;
+                    } else {
+                        continue;
+                    };
+                };
+
             } else {
                 continue;
             };
         };
-    };
 
-    if (validationResult) {
-        validationResult = false;
+        if (validationResult) {
+            validationResult = false;
+        };
     }
-
-    return validationResult;
 };
 
 export default Validator;

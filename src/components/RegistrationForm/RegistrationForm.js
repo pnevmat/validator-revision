@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import validator from '../../utils/validator';
+import Validator from '../../utils/validator';
 
 import styles from './registrationForm.module.css';
 
@@ -10,17 +10,20 @@ const RegistrationForm = () => {
     const [passwordChange, setPasswordChange] = useState('');
 
     const [emailValidation, setEmailValidation] = useState(false);
-    const [nameValidation, setNameValidation] = useState(false);
     const [passwordValidation, setPasswordValidation] = useState(false);
 
     const validationSchema = {
+        email: false,
         length: {min: 6, max: false},
-        capitalLetters: /([A-Z])/g,
-        numbers: /([0-9])/g,
-        symbols: /\W/g
+        custom: {
+            capitalLetters: /([A-Z])/g,
+            numbers: /([0-9])/g,
+            symbols: /\W/g
+        }
     };
 
     const errors = {
+        email: 'Email is not valid',
         length: {
             min: 'Statement should be at least 6 characters', 
             max: 'Statement should be not longer than 8 characters'
@@ -28,21 +31,23 @@ const RegistrationForm = () => {
         symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
     };
 
+    // const validator = new Validator(passwordChange, validationSchema, errors)
+
     const handleChange = (e) => {
         const {name, value} = e.target;
 
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(validator(emailChange, validationSchema, errors));
+                setEmailValidation(Validator.email(emailChange, validationSchema, errors));
                 break;
             case 'name':
                 setNameChange(value);
-                setNameValidation(validator(nameChange, validationSchema, errors));
                 break;
             case 'password':
                 setPasswordChange(value);
-                setPasswordValidation(validator(passwordChange, validationSchema, errors));
+                setPasswordValidation(Validator.minMax(passwordChange, validationSchema, errors).custom(passwordChange, validationSchema, errors));
+                console.log('Password validation: ', passwordValidation);
                 break;
             default:
                 break;
@@ -91,7 +96,6 @@ const RegistrationForm = () => {
                             handleChange(e);
                         }}
                     />
-                    {nameValidation && <p className={styles.errorMessage}>{nameValidation}</p>}
                 </label>
                 <label className={styles.inputLabel}>
                     <input

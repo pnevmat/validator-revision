@@ -19,12 +19,12 @@ const LoginForm = () => {
     };
 
     const errors = {
+        email: 'Email is not valid',
         length: 'Statement should be at least 6 characters',
-        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter',
-        email: 'Email is not valid'
+        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
     };
 
-    const validator = new Validator(emailChange, validationSchema, errors);
+    // const validator = new Validator(emailChange, validationSchema, errors);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -32,11 +32,11 @@ const LoginForm = () => {
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(validator.email());
+                setEmailValidation(Validator.email(emailChange, validationSchema, errors));
                 break;
             case 'password':
                 setPasswordChange(value);
-                setPasswordValidation(validator(passwordChange, validationSchema, errors));
+                setPasswordValidation(Validator.custom(passwordChange, validationSchema, errors));
                 break;
             default:
                 break;
