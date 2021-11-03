@@ -13,26 +13,31 @@ const RegistrationForm = () => {
     const [passwordValidation, setPasswordValidation] = useState(false);
 
     const validationSchema = {
-        email: false,
-        length: 6,
-        // {min: 6, max: false},
-        custom: /([A-Z])/g
-        // {
-        //     capitalLetters: /([A-Z])/g,
-        //     numbers: /([0-9])/g,
-        //     symbols: /\W/g
-        // }
+        length: {min: 6, max: 8},
+        // 6,
+        custom: {
+            capitalLetters: /([A-Z])/g,
+            numbers: /([0-9])/g,
+            symbols: /\W/g
+        },
+        // /([A-Z])/g,
+        errors: {
+            email: 'Email is not valid',
+            length: {
+                min: 'Statement should be at least 6 characters', 
+                max: 'Statement should be not longer than 8 characters'
+            },
+            // 'Statement length should be 6 characters',
+            symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
+        }
     };
 
-    const errors = {
-        email: 'Email is not valid',
-        length: 'Statement length should be 6 characters',
-        // {
-        //     min: 'Statement should be at least 6 characters', 
-        //     max: 'Statement should be not longer than 8 characters'
-        // },
-        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
-    };
+    const validation = {
+        // email: true,
+        // exactLength: true,
+        // minMax: true,
+        custom: true
+    }
 
     // const validator = new Validator(passwordChange, validationSchema, errors)
 
@@ -42,17 +47,17 @@ const RegistrationForm = () => {
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(Validator.exactLength(emailChange, validationSchema, errors));
+                setEmailValidation(Validator(emailChange, validationSchema, validation));
                 break;
             case 'name':
                 setNameChange(value);
                 break;
             case 'password':
                 setPasswordChange(value);
-                if (Validator.minMax(passwordChange, validationSchema, errors)) {
-                    setPasswordValidation(Validator.minMax(passwordChange, validationSchema, errors));
+                if (Validator(passwordChange, validationSchema, validation)) {
+                    setPasswordValidation(Validator(passwordChange, validationSchema, validation));
                 } else {
-                    setPasswordValidation(Validator.custom(passwordChange, validationSchema, errors));
+                    setPasswordValidation(Validator(passwordChange, validationSchema, validation));
                 };
                 console.log('Password validation: ', passwordValidation);
                 break;
