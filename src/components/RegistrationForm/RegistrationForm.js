@@ -15,9 +15,10 @@ const RegistrationForm = () => {
 
     const [emailValidation, setEmailValidation] = useState(false);
     const [passwordValidation, setPasswordValidation] = useState(false);
+    const [nameValidation, setNameValidation] = useState(false);
 
     const validationSchema = {
-        length: {min: 10, max: false},
+        length: {min: 6, max: false},
         // 6,
         custom: {
             capitalLetters: /([A-Z])/g,
@@ -28,7 +29,7 @@ const RegistrationForm = () => {
         errors: {
             email: 'Email is not valid',
             length: {
-                min: 'Statement should be at least 6 characters', 
+                min: `Statement should be at least 6 characters`, 
                 max: 'Statement should be not longer than 8 characters'
             },
             // 'Statement length should be 6 characters',
@@ -36,12 +37,12 @@ const RegistrationForm = () => {
         }
     };
 
-    const validation = {
-        // email: true,
-        // exactLength: true,
-        minMax: true,
-        custom: true
-    }
+    // const validation = {
+    //     // email: true,
+    //     // exactLength: true,
+    //     minMax: true,
+    //     custom: true
+    // }
 
     // const validator = new Validator(passwordChange, validationSchema, errors)
 
@@ -52,16 +53,17 @@ const RegistrationForm = () => {
             case 'email':
                 emailChange = value;
                 // setEmailChange(value);
-                setEmailValidation(Validator(emailChange, validationSchema, validation));
+                setEmailValidation(Validator(emailChange, validationSchema, {email: true}));
                 break;
             case 'name':
                 nameChange = value;
                 // setNameChange(value);
+                setNameValidation(Validator(nameChange, validationSchema, {minMax: true}))
                 break;
             case 'password':
                 passwordChange = value;
                 // setPasswordChange(value);
-                setPasswordValidation(Validator(passwordChange, validationSchema, validation));
+                setPasswordValidation(Validator(passwordChange, validationSchema, {minMax: true, custom: true}));
                 console.log('Password validation: ', passwordValidation);
                 break;
             default:
@@ -111,6 +113,7 @@ const RegistrationForm = () => {
                             handleChange(e);
                         }}
                     />
+                    {nameValidation && <p className={styles.errorMessage}>{nameValidation}</p>}
                 </label>
                 <label className={styles.inputLabel}>
                     <input

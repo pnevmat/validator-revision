@@ -7,8 +7,12 @@ let isValidExactLength = null;
 let isValidCustom = null;
 
 console.log('Validation result announcement: ', validationResult);
-// TODO: исправить проблемму невозможности валидировать один инпут по более 2-м параметрам
-     //  исправить отставание валидации от ввода пользователя когда идет валидация по 2 и более параметрам
+// TODO: 
+    // исправить: проблемму невозможности валидировать один инпут по более 2-м параметрам изза того что функция 
+                // валидатора объвлена и переменные isValid так же объвлены и обновятся только при перерендере приложения а 
+                // обновить их в функции валидатора невозможно так как это сделает невозможным валидацию по нескольким 
+                // параметрам(условие запуска функции валидации по параметру будет зацыклено на первом параметре валидации)
+    //  исправить: отставание валидации от ввода пользователя когда идет валидация по 2 и более параметрам
 function Validator(phrase, validationSchema, validation) {
 
     // pattern validations (validations on predefined schemas)
@@ -24,7 +28,7 @@ function Validator(phrase, validationSchema, validation) {
             isValidMinMax = true;
             isValidExactLength = true;
             isValidCustom = true;
-            // console.log('Email validation result: ', validationResult);
+            console.log('Email validation result: ', validationResult);
             return validationResult;
         } else {
             isValidEmail = true;
@@ -38,18 +42,17 @@ function Validator(phrase, validationSchema, validation) {
 
     // Min/max phrase length validation
     function minMax() {
-
         if (validationSchema.length) {
             // console.log('Validation schema length: ', validationSchema.length);
             if (typeof validationSchema.length === 'object') {
                 // console.log('Is validation schema length object: ', typeof validationSchema.length);
-                // console.log('Phrase length: ', phrase.length);
+                console.log('Phrase length: ', phrase.length);
                 if (typeof validationSchema.length.min === 'number' && phrase.length < validationSchema.length.min) {
                     isValidEmail = true;
                     isValidMinMax = false;
                     isValidExactLength = true;
                     isValidCustom = true;
-
+                    
                     return validationResult = validationSchema.errors.length.min;
                 };
     
@@ -62,10 +65,17 @@ function Validator(phrase, validationSchema, validation) {
                     return validationResult = validationSchema.errors.length.max;
                 };
 
-                isValidEmail = false;
                 isValidMinMax = true;
-                isValidExactLength = false;
-                isValidCustom = false;
+                if (Object.keys(validation).find(key => key !== 'minMax')) {
+                    console.log('minMax other valids nulling started');
+                    isValidEmail = null;
+                    isValidExactLength = null;
+                    isValidCustom = null;
+                } else {
+                    isValidEmail = false;
+                    isValidExactLength = false;
+                    isValidCustom = false;
+                }
 
                 return validationResult = false;
     
@@ -175,6 +185,8 @@ function Validator(phrase, validationSchema, validation) {
             email();
             break;
         } else if (key === 'minMax') {
+            console.log('minMax condition mached');
+            console.log('is valid min max: ', isValidMinMax);
             if (isValidMinMax) {continue};
             minMax();
             break;
@@ -183,6 +195,7 @@ function Validator(phrase, validationSchema, validation) {
             exactLength();
             break;
         } else if (key === 'custom') {
+            console.log('custom condition mached');
             if (isValidCustom) {continue};
             custom();
             break;
