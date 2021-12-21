@@ -8,11 +8,11 @@ let isValidCustom = null;
 
 console.log('Validation result announcement: ', validationResult);
 // TODO: 
-    // исправить: исправлена проблемма невозможности валидации по более чем 2 параметрам путем добавлени в
-                // каждую функцию вызова следующей по очереди валидации если така есть 
+    // исправить: исправлена проблемма невозможности валидации по более чем 2 параметрам путем добавления в
+                // каждую функцию вызова следующей по очереди валидации если такая есть 
     // исправить: периодическое проскакивание ошибки валидации пароля после того как он стал валидным и пользователь продолжает набор
-    // исправить: отставание валидации от ввода пользователя когда идет валидация по 2 и более параметрам не замечено
-function Validator(phrase, validationSchema, validation) {
+    // исправить: Проблеммy залипания и опаздывания значений из инпута для валидатора в использовании useState в реакте
+function validator(phrase, validationSchema, validation) {
 
     // pattern validations (validations on predefined schemas)
     function email() {
@@ -134,8 +134,6 @@ function Validator(phrase, validationSchema, validation) {
 
         if (typeof validationSchema.length === 'number') {
             if (phrase.length < validationSchema.length || phrase.length > validationSchema.length) {
-                // console.log('Validation schema length in exactLangth func: ', validationSchema.length);
-                // console.log('Phrase length: ', phrase.length);
                 validationResult = validationSchema.errors.length;
 
                 isValidEmail = true;
@@ -341,4 +339,4 @@ function Validator(phrase, validationSchema, validation) {
     return validationResult;
 };
 
-export default Validator;
+export default validator;

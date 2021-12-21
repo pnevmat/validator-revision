@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import Validator from '../../utils/validator';
+import validator from '../../utils/validator';
 
 import styles from './registrationForm.module.css';
 
@@ -37,15 +37,6 @@ const RegistrationForm = () => {
         }
     };
 
-    // const validation = {
-    //     // email: true,
-    //     // exactLength: true,
-    //     minMax: true,
-    //     custom: true
-    // }
-
-    // const validator = new Validator(passwordChange, validationSchema, errors)
-
     const handleChange = (e) => {
         const {name, value} = e.target;
 
@@ -53,25 +44,33 @@ const RegistrationForm = () => {
             case 'email':
                 emailChange = value;
                 // setEmailChange(value);
-                setEmailValidation(Validator(emailChange, validationSchema, {email: true}));
+                setEmailValidation(validator(emailChange, {
+                    length: 6,
+                    errors: {
+                        email: 'Email is not valid', 
+                        length: 'Statement length should be 6 characters'
+                    }
+                }, {email: true, exactLength: true}));
                 break;
             case 'name':
                 nameChange = value;
                 // setNameChange(value);
-                setNameValidation(Validator(nameChange, {
+                setNameValidation(validator(nameChange, {
                     length: {min: 6, max: 12}, 
+                    custom: {capitalLetters: /([A-Z])/g},
                     errors: {
                         length: {
                             min: `Statement should be at least 6 characters`, 
                             max: 'Statement should be not longer than 8 characters'
                         },
+                        symbols: 'Statement should contain at least 1 capital letter'
                     }
-                }, {minMax: true}))
+                }, {minMax: true, custom: true}))
                 break;
             case 'password':
                 passwordChange = value;
                 // setPasswordChange(value);
-                setPasswordValidation(Validator(passwordChange, validationSchema, {minMax: true, custom: true}));
+                setPasswordValidation(validator(passwordChange, validationSchema, {minMax: true, custom: true}));
                 console.log('Password validation: ', passwordValidation);
                 break;
             default:

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import Validator from '../../utils/validator';
+import validator from '../../utils/validator';
 
 import styles from './loginForm.module.css';
 
@@ -12,19 +12,24 @@ const LoginForm = () => {
     const [passwordValidation, setPasswordValidation] = useState(false);
 
     const validationSchema = {
-        length: 6,
-        capitalLetters: /([A-Z])/g,
-        numbers: /([0-9])/g,
-        symbols: /\W/g
+        length: {min: 6, max: false},
+        // 6,
+        custom: {
+            capitalLetters: /([A-Z])/g,
+            numbers: /([0-9])/g,
+            symbols: /\W/g
+        },
+        // /([A-Z])/g,
+        errors: {
+            email: 'Email is not valid',
+            length: {
+                min: `Statement should be at least 6 characters`, 
+                max: 'Statement should be not longer than 8 characters'
+            },
+            // 'Statement length should be 6 characters',
+            symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
+        }
     };
-
-    const errors = {
-        email: 'Email is not valid',
-        length: 'Statement should be at least 6 characters',
-        symbols: 'Statement should contain at least 1 capital, 1 number and 1 symbol letter'
-    };
-
-    // const validator = new Validator(emailChange, validationSchema, errors);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -32,11 +37,11 @@ const LoginForm = () => {
         switch (name) {
             case 'email':
                 setEmailChange(value);
-                setEmailValidation(Validator.email(emailChange, validationSchema, errors));
+                setEmailValidation(validator(emailChange, validationSchema, {email: true}));
                 break;
             case 'password':
                 setPasswordChange(value);
-                setPasswordValidation(Validator.custom(passwordChange, validationSchema, errors));
+                setPasswordValidation(validator(passwordChange, validationSchema, {custom: true}));
                 break;
             default:
                 break;
