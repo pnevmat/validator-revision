@@ -8,11 +8,10 @@ let isValidCustom = null;
 
 console.log('Validation result announcement: ', validationResult);
 // TODO: 
-    // исправить: проблемму невозможности валидировать один инпут по более 2-м параметрам изза того что функция 
-                // валидатора объвлена и переменные isValid так же объвлены и обновятся только при перерендере приложения а 
-                // обновить их в функции валидатора невозможно так как это сделает невозможным валидацию по нескольким 
-                // параметрам(условие запуска функции валидации по параметру будет зацыклено на первом параметре валидации)
-    //  исправить: отставание валидации от ввода пользователя когда идет валидация по 2 и более параметрам
+    // исправить: исправлена проблемма невозможности валидации по более чем 2 параметрам путем добавлени в
+                // каждую функцию вызова следующей по очереди валидации если така есть 
+    // исправить: периодическое проскакивание ошибки валидации пароля после того как он стал валидным и пользователь продолжает набор
+    // исправить: отставание валидации от ввода пользователя когда идет валидация по 2 и более параметрам не замечено
 function Validator(phrase, validationSchema, validation) {
 
     // pattern validations (validations on predefined schemas)
@@ -41,11 +40,9 @@ function Validator(phrase, validationSchema, validation) {
     };
 
     // Min/max phrase length validation
-    function minMax() {
+    function minMax(otherValidation=null) {
         if (validationSchema.length) {
-            // console.log('Validation schema length: ', validationSchema.length);
             if (typeof validationSchema.length === 'object') {
-                // console.log('Is validation schema length object: ', typeof validationSchema.length);
                 console.log('Phrase length: ', phrase.length);
                 if (typeof validationSchema.length.min === 'number' && phrase.length < validationSchema.length.min) {
                     isValidEmail = true;
@@ -66,12 +63,57 @@ function Validator(phrase, validationSchema, validation) {
                 };
 
                 isValidMinMax = true;
-                if (Object.keys(validation).find(key => key !== 'minMax')) {
-                    console.log('minMax other valids nulling started');
-                    isValidEmail = null;
-                    isValidExactLength = null;
-                    isValidCustom = null;
-                } else {
+                if (otherValidation && otherValidation.find(key => key !== 'minMax')) {
+                    console.log('Other validation started');
+
+                    const newValidation = otherValidation.filter(key => key !== 'minMax');
+
+                    for (let key of newValidation) {
+                        if (key === 'email') {
+                            if (isValidEmail) {continue};
+                            email();
+                            break;
+                        } else if (key === 'exactLength') {
+                            if (isValidExactLength) {continue};
+                            exactLength(newValidation);
+                            break;
+                        } else if (key === 'custom') {
+                            console.log('custom condition mached');
+                            console.log('Min max Is valid custom: ', isValidCustom);
+                            if (isValidCustom) {continue};
+                            custom(newValidation);
+                            break;
+                        } else {
+                            return;
+                        };
+                    };
+
+                    isValidEmail = false;
+                    isValidExactLength = false;
+                    isValidCustom = false;
+                } else if (Object.keys(validation).find(key => key !== 'minMax') && isValidMinMax) {
+                    const newValidation = Object.keys(validation).filter(key => key !== 'minMax');
+
+                    for (let key of newValidation) {
+                        if (key === 'email') {
+                            if (isValidEmail) {continue};
+                            email();
+                            break;
+                        } else if (key === 'exactLength') {
+                            if (isValidExactLength) {continue};
+                            exactLength(newValidation);
+                            break;
+                        } else if (key === 'custom') {
+                            console.log('custom condition mached');
+                            console.log('Min max Is valid custom: ', isValidCustom);
+                            if (isValidCustom) {continue};
+                            custom(newValidation);
+                            break;
+                        } else {
+                            return;
+                        };
+                    };
+
                     isValidEmail = false;
                     isValidExactLength = false;
                     isValidCustom = false;
@@ -116,7 +158,7 @@ function Validator(phrase, validationSchema, validation) {
     };
     
     // Custom validation (put validation Regexp to validation schema)
-    function custom() {
+    function custom(otherValidation=null) {
         
         const validationSchemaKeys = Object.keys(validationSchema);
 
@@ -126,10 +168,7 @@ function Validator(phrase, validationSchema, validation) {
                 if (typeof validationSchema[key] === 'object') {
                     const customKeys = Object.keys(validationSchema[key]);
                     for (let customKey of customKeys) {
-                        // console.log('Phrase: ', phrase);
-                        // console.log('Custom key value: ', validationSchema.custom[customKey]);
                         validationResult = validationSchema.custom[customKey].test(phrase);
-                        // console.log('Validation result: ', validationResult);
                         if (!validationResult) {
                             validationResult = validationSchema.errors.symbols;
 
@@ -141,10 +180,56 @@ function Validator(phrase, validationSchema, validation) {
                             return validationResult;
                         };
 
-                        isValidEmail = false;
-                        isValidMinMax = false;
-                        isValidExactLength = false;
                         isValidCustom = true;
+                        if (otherValidation && otherValidation.find(key => key !== 'custom')) {
+                                const newValidation = otherValidation.filter(key => key !== 'custom');
+
+                                for (let key of newValidation) {
+                                    if (key === 'email') {
+                                        if (isValidEmail) {continue};
+                                        email();
+                                        break;
+                                    } else if (key === 'minMax') {
+                                        if (isValidMinMax) {continue};
+                                        minMax(newValidation);
+                                        break;
+                                    } else if (key === 'exactLength') {
+                                        if (isValidExactLength) {continue};
+                                        exactLength(newValidation);
+                                        break;
+                                    } else {
+                                        return;
+                                    };
+                                };
+
+                            isValidEmail = false;
+                            isValidMinMax = false;
+                            isValidExactLength = false;
+                        } else if (Object.keys(validation).find(key => key !== 'custom') && isValidCustom) {
+                            const newValidation = Object.keys(validation).filter(key => key !== 'custom');
+
+                                for (let key of newValidation) {
+                                    if (key === 'email') {
+                                        if (isValidEmail) {continue};
+                                        email();
+                                        break;
+                                    } else if (key === 'minMax') {
+                                        if (isValidMinMax) {continue};
+                                        minMax(newValidation);
+                                        break;
+                                    } else if (key === 'exactLength') {
+                                        if (isValidExactLength) {continue};
+                                        exactLength(newValidation);
+                                        break;
+                                    } else {
+                                        return;
+                                    };
+                                };
+
+                            isValidEmail = false;
+                            isValidMinMax = false;
+                            isValidExactLength = false;
+                        };
                     };
                 } else {
                     validationResult = validationSchema[key].test(phrase);
@@ -158,13 +243,63 @@ function Validator(phrase, validationSchema, validation) {
                         isValidCustom = false;
 
                         return validationResult;
-                    } else {
+                    }
+
+                    isValidCustom = true;
+                    if (otherValidation && otherValidation.find(key => key !== 'custom')) {
+                        console.log('Other validation started');
+
+                            const newValidation = otherValidation.filter(key => key !== 'custom');
+
+                            for (let key of newValidation) {
+                                if (key === 'email') {
+                                    if (isValidEmail) {continue};
+                                    email();
+                                    break;
+                                } else if (key === 'minMax') {
+                                    console.log('minMax condition mached');
+                                    console.log('is valid min max: ', isValidMinMax);
+                                    if (isValidMinMax) {continue};
+                                    minMax(newValidation);
+                                    break;
+                                } else if (key === 'exactLength') {
+                                    if (isValidExactLength) {continue};
+                                    exactLength(newValidation);
+                                    break;
+                                } else {
+                                    return;
+                                };
+                            };
+
                         isValidEmail = false;
                         isValidMinMax = false;
                         isValidExactLength = false;
-                        isValidCustom = true;
+                    } else if (Object.keys(validation).find(key => key !== 'custom') && isValidCustom) {
+                        const newValidation = Object.keys(validation).filter(key => key !== 'custom');
 
-                        return validationResult = false;
+                            for (let key of newValidation) {
+                                if (key === 'email') {
+                                    if (isValidEmail) {continue};
+                                    email();
+                                    break;
+                                } else if (key === 'minMax') {
+                                    console.log('minMax condition mached');
+                                    console.log('is valid min max: ', isValidMinMax);
+                                    if (isValidMinMax) {continue};
+                                    minMax(newValidation);
+                                    break;
+                                } else if (key === 'exactLength') {
+                                    if (isValidExactLength) {continue};
+                                    exactLength(newValidation);
+                                    break;
+                                } else {
+                                    return;
+                                };
+                            };
+
+                        isValidEmail = false;
+                        isValidMinMax = false;
+                        isValidExactLength = false;
                     };
                 };
 
@@ -172,10 +307,6 @@ function Validator(phrase, validationSchema, validation) {
                 continue;
             };
         };
-
-        // if (validationResult) {
-        //     validationResult = false;
-        // };
     };
 
     const validationKeys = Object.keys(validation);
@@ -187,6 +318,8 @@ function Validator(phrase, validationSchema, validation) {
         } else if (key === 'minMax') {
             console.log('minMax condition mached');
             console.log('is valid min max: ', isValidMinMax);
+            if (validationSchema.length.max && phrase.length > validationSchema.length.max) {isValidMinMax = false}
+            if (isValidMinMax && phrase.length < validationSchema.length.min) {isValidMinMax = false}
             if (isValidMinMax) {continue};
             minMax();
             break;
@@ -196,6 +329,7 @@ function Validator(phrase, validationSchema, validation) {
             break;
         } else if (key === 'custom') {
             console.log('custom condition mached');
+            console.log('Is valid custom: ', isValidCustom);
             if (isValidCustom) {continue};
             custom();
             break;

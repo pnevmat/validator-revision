@@ -58,7 +58,15 @@ const RegistrationForm = () => {
             case 'name':
                 nameChange = value;
                 // setNameChange(value);
-                setNameValidation(Validator(nameChange, validationSchema, {minMax: true}))
+                setNameValidation(Validator(nameChange, {
+                    length: {min: 6, max: 12}, 
+                    errors: {
+                        length: {
+                            min: `Statement should be at least 6 characters`, 
+                            max: 'Statement should be not longer than 8 characters'
+                        },
+                    }
+                }, {minMax: true}))
                 break;
             case 'password':
                 passwordChange = value;
