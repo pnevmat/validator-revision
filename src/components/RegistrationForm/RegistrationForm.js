@@ -78,8 +78,6 @@ const RegistrationForm = () => {
         };
     };
 
-
-
     const handleSubmit = () => {
 
         if (emailChange !== '' && nameChange !== '' && passwordChange !== '') {

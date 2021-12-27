@@ -7,11 +7,15 @@ let isValidExactLength = null;
 let isValidCustom = null;
 
 console.log('Validation result announcement: ', validationResult);
+// DONE:
+    // исправлена проблемма невозможности валидации по более чем 2 параметрам путем добавления в
+        // каждую функцию вызова следующей по очереди валидации если такая есть 
+    // исправлена ошибка периодического проскакивания ошибки валидации пароля после того как он стал валидным 
+        // и пользователь продолжает набор
 // TODO: 
-    // исправить: исправлена проблемма невозможности валидации по более чем 2 параметрам путем добавления в
-                // каждую функцию вызова следующей по очереди валидации если такая есть 
-    // исправить: периодическое проскакивание ошибки валидации пароля после того как он стал валидным и пользователь продолжает набор
-    // исправить: Проблеммy залипания и опаздывания значений из инпута для валидатора в использовании useState в реакте
+    // Adapt validator for React:
+        // исправить: Проблеммy залипания и опаздывания значений из инпута для валидатора в использовании useState в реакте
+        // исправить: Проблемму опаздывания useState в реакте дл вывода ошибки валидации сразу после того как длинна фразы стала валидной
 function validator(phrase, validationSchema, validation) {
 
     // pattern validations (validations on predefined schemas)
@@ -64,7 +68,7 @@ function validator(phrase, validationSchema, validation) {
 
                 isValidMinMax = true;
                 if (otherValidation && otherValidation.find(key => key !== 'minMax')) {
-                    console.log('Other validation started');
+                    // console.log('Other validation started');
 
                     const newValidation = otherValidation.filter(key => key !== 'minMax');
 
@@ -78,8 +82,8 @@ function validator(phrase, validationSchema, validation) {
                             exactLength(newValidation);
                             break;
                         } else if (key === 'custom') {
-                            console.log('custom condition mached');
-                            console.log('Min max Is valid custom: ', isValidCustom);
+                            // console.log('custom condition mached');
+                            // console.log('Min max Is valid custom: ', isValidCustom);
                             if (isValidCustom) {continue};
                             custom(newValidation);
                             break;
@@ -94,6 +98,10 @@ function validator(phrase, validationSchema, validation) {
                 } else if (Object.keys(validation).find(key => key !== 'minMax') && isValidMinMax) {
                     const newValidation = Object.keys(validation).filter(key => key !== 'minMax');
 
+                    isValidEmail = false;
+                    isValidExactLength = false;
+                    isValidCustom = false;
+
                     for (let key of newValidation) {
                         if (key === 'email') {
                             if (isValidEmail) {continue};
@@ -104,19 +112,16 @@ function validator(phrase, validationSchema, validation) {
                             exactLength(newValidation);
                             break;
                         } else if (key === 'custom') {
-                            console.log('custom condition mached');
-                            console.log('Min max Is valid custom: ', isValidCustom);
+                            // console.log('In isValidMinMax custom condition mached');
+                            // console.log('Min max Is valid custom: ', isValidCustom);
                             if (isValidCustom) {continue};
+                            // console.log('Min max custom validation function return value: ', custom(newValidation));
                             custom(newValidation);
                             break;
                         } else {
                             return;
                         };
                     };
-
-                    isValidEmail = false;
-                    isValidExactLength = false;
-                    isValidCustom = false;
                 }
 
                 return validationResult = false;
@@ -157,7 +162,7 @@ function validator(phrase, validationSchema, validation) {
     
     // Custom validation (put validation Regexp to validation schema)
     function custom(otherValidation=null) {
-        
+        // console.log('Custom validation started');
         const validationSchemaKeys = Object.keys(validationSchema);
 
         for (let key of validationSchemaKeys) {
@@ -167,9 +172,10 @@ function validator(phrase, validationSchema, validation) {
                     const customKeys = Object.keys(validationSchema[key]);
                     for (let customKey of customKeys) {
                         validationResult = validationSchema.custom[customKey].test(phrase);
+                        // console.log('Custom Validation result: ', validationResult);
                         if (!validationResult) {
                             validationResult = validationSchema.errors.symbols;
-
+                            // console.log('Custom Validation result changed to error: ', validationResult);
                             isValidEmail = true;
                             isValidMinMax = true;
                             isValidExactLength = true;
